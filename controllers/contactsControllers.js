@@ -1,23 +1,18 @@
 const { controllerWrapper } = require("../decorators/controllerWrapper");
 const { HttpError } = require("../helpers/HttpError");
 
-const {
-  getAllContactsService,
-  getContactService,
-  addContactService,
-  updateContactService,
-  removeContactService,
-} = require("../models/contactsService");
+const { Contact } = require("../models/contactModel");
 
 const getAllContacts = async (req, res) => {
-  const contacts = await getAllContactsService();
+  const contacts = await Contact.find();
 
   res.status(200).json(contacts);
 };
 
 const getContact = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await getContactService(contactId);
+  const contact = await Contact.findById(contactId);
+
   if (!contact) {
     throw new HttpError(404, "Contact not found");
   }
@@ -26,14 +21,24 @@ const getContact = async (req, res) => {
 };
 
 const addContact = async (req, res) => {
-  const newContact = await addContactService(req.body);
+  const newContact = await Contact.create(req.body);
 
   res.status(201).json(newContact);
 };
 
 const updateContact = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await updateContactService(contactId, req.body);
+  const contact = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
+  if (!contact) {
+    throw new HttpError(404, "Contact not found");
+  }
+
+  res.status(200).json(contact);
+};
+
+const updateStatusContact = async (req, res) => {
+  const { contactId } = req.params;
+  const contact = await Contact.findByIdAndUpdate(contactId, req.body, { new: true });
   if (!contact) {
     throw new HttpError(404, "Contact not found");
   }
@@ -43,7 +48,7 @@ const updateContact = async (req, res) => {
 
 const removeContact = async (req, res) => {
   const { contactId } = req.params;
-  const contact = await removeContactService(contactId);
+  const contact = await Contact.findByIdAndRemove(contactId);
   if (!contact) {
     throw new HttpError(404, "Contact not found");
   }
@@ -56,5 +61,6 @@ module.exports = {
   getContact: controllerWrapper(getContact),
   addContact: controllerWrapper(addContact),
   updateContact: controllerWrapper(updateContact),
+  updateStatusContact: controllerWrapper(updateStatusContact),
   removeContact: controllerWrapper(removeContact),
 };
