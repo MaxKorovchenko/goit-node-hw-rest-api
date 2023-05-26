@@ -1,7 +1,7 @@
-const { controllerWrapper } = require("../decorators/controllerWrapper");
+const { controllerWrapper } = require("../helpers/controllerWrapper");
 const { HttpError } = require("../helpers/HttpError");
 
-const { Contact } = require("../models/contactModel");
+const { Contact } = require("../models/contact");
 
 const getAllContacts = async (req, res) => {
   const contacts = await Contact.find();

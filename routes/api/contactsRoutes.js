@@ -9,9 +9,9 @@ const {
   updateStatusContact,
 } = require("../../controllers/contactsControllers");
 
-const { validateBody } = require("../../decorators/validateBody");
-const { contactAddSchema, updateFavoriteSchema } = require("../../models/contactModel");
-const { isValidId } = require("../../helpers/isValidId");
+const { validateBody } = require("../../middlewares/validateBody");
+const { contactAddSchema, updateFavoriteSchema } = require("../../schemas/contactSchemas");
+const { isValidId } = require("../../middlewares/isValidId");
 
 const router = express.Router();
 
