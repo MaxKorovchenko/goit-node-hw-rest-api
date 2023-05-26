@@ -19,7 +19,7 @@ router.get("/", getAllContacts);
 
 router.get("/:contactId", isValidId, getContact);
 
-router.route("/").post(validateBody(contactAddSchema), addContact);
+router.post("/", validateBody(contactAddSchema), addContact);
 
 router.put("/:contactId", isValidId, validateBody(contactAddSchema), updateContact);
 
@@ -27,4 +27,6 @@ router.patch("/:contactId/favorite", isValidId, validateBody(updateFavoriteSchem
 
 router.delete("/:contactId", isValidId, removeContact);
 
-module.exports = router;
+module.exports = {
+  contactsRouter: router,
+};
