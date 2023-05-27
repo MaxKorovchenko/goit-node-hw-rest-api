@@ -5,9 +5,14 @@ const { Contact } = require("../models/contact");
 
 const getAllContacts = async (req, res) => {
   const { _id: owner } = req.user;
-  const { page = 1, limit = 5 } = req.query;
+  const { page = 1, limit = 5, favorite } = req.query;
   const skip = (page - 1) * limit;
-  const contacts = await Contact.find({ owner }, "-createdAt -updatedAt", { skip, limit }).populate(
+  const filter = {};
+
+  if (favorite === "false") filter.favorite = false;
+  if (favorite === "true") filter.favorite = true;
+
+  const contacts = await Contact.find({ owner, ...filter }, "-createdAt -updatedAt", { skip, limit }).populate(
     "owner",
     "name email"
   );
