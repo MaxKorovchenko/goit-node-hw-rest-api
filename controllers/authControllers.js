@@ -66,9 +66,17 @@ const getCurrentUser = controllerWrapper(async (req, res) => {
   });
 });
 
+const updateSubscription = controllerWrapper(async (req, res) => {
+  const { _id } = req.user;
+  const user = await User.findByIdAndUpdate(_id, req.body, { new: true });
+
+  res.status(200).json(user);
+});
+
 module.exports = {
   register,
   login,
   logout,
   getCurrentUser,
+  updateSubscription,
 };
