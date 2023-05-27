@@ -42,13 +42,29 @@ const login = controllerWrapper(async (req, res) => {
   };
 
   const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: "22h" });
+  await User.findByIdAndUpdate(user._id, { token });
 
   res.json({ token });
 });
 
-const logout = controllerWrapper(async (req, res) => {});
+const logout = controllerWrapper(async (req, res) => {
+  const { _id } = req.user;
+  await User.findByIdAndUpdate(_id, { token: "" });
 
-const getCurrentUser = controllerWrapper(async (req, res) => {});
+  res.json({
+    message: "Logout success",
+  });
+});
+
+const getCurrentUser = controllerWrapper(async (req, res) => {
+  const { name, email, subscription } = req.user;
+
+  res.json({
+    name,
+    email,
+    subscription,
+  });
+});
 
 module.exports = {
   register,
