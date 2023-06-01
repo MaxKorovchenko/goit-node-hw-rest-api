@@ -11,6 +11,7 @@ const {
   updateAvatar,
 } = require("../../controllers/authControllers");
 const { authenticate } = require("../../middlewares/authenticate");
+const { upload } = require("../../middlewares/upload");
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.get("/current", authenticate, getCurrentUser);
 
 router.patch("/", authenticate, validateBody(updateSubscriptionSchema), updateSubscription);
 
-router.patch("/avatars", authenticate, updateAvatar);
+router.patch("/avatars", authenticate, upload.single("avatar"), updateAvatar);
 
 module.exports = {
   authRouter: router,
