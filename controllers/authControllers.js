@@ -46,12 +46,59 @@ const register = controllerWrapper(async (req, res) => {
   });
 });
 
+const verifyEmail = controllerWrapper(async (req, res) => {
+  const { verificationCode } = req.params;
+  const user = await User.findOne({ verificationCode });
+
+  if (!user) {
+    throw new HttpError(404, 'Email not found');
+  }
+
+  await User.findByIdAndUpdate(user._id, {
+    verify: true,
+    verificationCode: null,
+  });
+
+  res.json({
+    message: 'Verification successful',
+  });
+});
+
+const resendVerifyEmail = controllerWrapper(async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new HttpError(404, 'Email not found');
+  }
+
+  if (user.verify) {
+    throw new HttpError(400, 'Email already verified');
+  }
+
+  const resendVerifyEmail = {
+    to: email,
+    subject: 'Email verification',
+    html: `<a href="${PROJECT_URL}/api/auth/verify/${user.verificationCode}" target="_blank">Click to verify email</a>`,
+  };
+
+  await sendEmail(resendVerifyEmail);
+
+  res.json({
+    message: 'Verification email resend',
+  });
+});
+
 const login = controllerWrapper(async (req, res) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
 
   if (!user) {
     throw new HttpError(401, 'Email or password invalid');
+  }
+
+  if (!user.verify) {
+    throw new HttpError(401, 'Email not verified');
   }
 
   const passwordCompare = await bcrypt.compare(password, user.password);
@@ -120,6 +167,8 @@ const updateAvatar = controllerWrapper(async (req, res) => {
 
 module.exports = {
   register,
+  verifyEmail,
+  resendVerifyEmail,
   login,
   logout,
   getCurrentUser,
